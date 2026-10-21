@@ -1,11 +1,15 @@
 from flask import Flask, request, jsonify
 
-from asymsched import asymsched
-from models import App, Placement
+try:
+    from .asymsched import asymsched
+    from .models import App, Placement
+except ImportError:  # Support running this file from the package directory.
+    from asymsched import asymsched
+    from models import App, Placement
 
 flask_app = Flask(__name__)
 
-@flask_app.route('/api/asymsched_once')
+@flask_app.route('/api/asymsched_once', methods=['POST'])
 def asymsched_once():
     """ 单次调用asymsched算法，返回最优放置策略
     """

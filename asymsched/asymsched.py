@@ -2,7 +2,10 @@ import math
 import itertools
 import sys
 
-from models import Cluster, App, Placement
+try:
+    from .models import Cluster, App, Placement
+except ImportError:  # Support the original direct-script invocation.
+    from models import Cluster, App, Placement
 
 def do_placements(num_nodes, apps):
     """ 通过排列组合枚举的方式，产生所有可能的放置策略。
@@ -74,7 +77,7 @@ def calculate_pwbw(placements, apps, bandwidths):
         一个整型数值，表示所有placements中最大的权重值
     """
 
-    max_wbw = 0
+    max_wbw = -float('inf')
     for placement in placements:
         for app_id, app_placement in enumerate(placement.placements):
             for cluster_id, cluster_placement in enumerate(app_placement):
@@ -191,7 +194,9 @@ def asymsched(apps, bandwidths, remote_access):
                     if node_from != node_to:
                         cluster.rbw += remote_access[node_from][node_to]
 
-            cluster.weight = math.log(cluster.rbw)
+            # Zero observed remote traffic means no affinity pressure. Keep the
+            # cluster eligible so an all-zero sample still selects least migration.
+            cluster.weight = math.log(cluster.rbw) if cluster.rbw > 0 else 0.0
 
     # 计算所有可能的放置策略
     num_nodes = len(bandwidths)
