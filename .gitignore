@@ -1,2 +1,7 @@
-venv
-*__pycache__*
+build/
+build-*/
+*.o
+*.a
+*.d
+__pycache__/
+*.pyc

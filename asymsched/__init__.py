@@ -1,1 +1,0 @@
-"""AsymSched demo package."""
